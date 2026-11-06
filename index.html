@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MicroTube</title>
+<style>
+:root{--bg:#0f0f0f;--bg2:#272727;--bg3:#1a1a1a;--tx:#f1f1f1;--tx2:#aaa;--line:#3f3f3f;--red:#f00;--hover:#ffffff1a;--chip:#ffffff1a;--chipa:#f1f1f1;--chipat:#0f0f0f}
+:root.light{--bg:#fff;--bg2:#f2f2f2;--bg3:#fafafa;--tx:#0f0f0f;--tx2:#606060;--line:#e5e5e5;--hover:#0000000d;--chip:#0000000d;--chipa:#0f0f0f;--chipat:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 Roboto,Arial,sans-serif}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid #3ea6ff;outline-offset:2px}
+header{position:fixed;top:0;left:0;right:0;height:56px;background:var(--bg);display:flex;align-items:center;justify-content:space-between;padding:0 16px;z-index:50;gap:12px}
+.hl,.hr{display:flex;align-items:center;gap:8px}
+.ib{width:40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:18px}
+.ib:hover{background:var(--hover)}
+.logo{display:flex;align-items:center;gap:4px;font-weight:700;font-size:20px;letter-spacing:-1px}
+.logo i{background:var(--red);color:#fff;width:30px;height:21px;border-radius:6px;display:grid;place-items:center;font-size:10px;font-style:normal;letter-spacing:0}
+.sb{display:flex;flex:0 1 640px;min-width:0}
+.sb input{flex:1;min-width:0;height:40px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:20px 0 0 20px;padding:0 16px;font-size:16px}
+.sb button{width:64px;height:40px;border:1px solid var(--line);border-left:0;border-radius:0 20px 20px 0;background:var(--bg2)}
+#sugg{position:absolute;top:50px;background:var(--bg2);border-radius:12px;padding:8px 0;width:min(560px,90vw);display:none;box-shadow:0 4px 32px #0006}
+#sugg div{padding:6px 16px;cursor:pointer}#sugg div:hover{background:var(--hover)}
+.sw{position:relative;flex:0 1 640px;display:flex;justify-content:center}
+nav{position:fixed;top:56px;left:0;bottom:0;width:220px;padding:12px;overflow-y:auto;background:var(--bg);z-index:40}
+nav a,nav button{display:flex;align-items:center;gap:20px;width:100%;padding:0 12px;height:40px;border-radius:10px;text-align:left}
+nav a:hover,nav button:hover{background:var(--hover)}nav a.on{background:var(--bg2);font-weight:600}
+nav hr{border:0;border-top:1px solid var(--line);margin:12px 0}nav h4{margin:8px 12px;font-size:16px}
+nav .av{width:24px;height:24px;border-radius:50%;object-fit:cover;flex:none}
+body.mini nav{display:none}
+main{margin-left:220px;padding:56px 24px 40px}
+body.mini main{margin-left:0}
+.chips{position:sticky;top:56px;background:var(--bg);z-index:30;display:flex;gap:12px;overflow-x:auto;padding:12px 0;scrollbar-width:none}
+.chip{background:var(--chip);padding:0 12px;height:32px;border-radius:8px;white-space:nowrap;font-weight:500}
+.chip.on{background:var(--chipa);color:var(--chipat)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px 16px;padding-top:12px}
+.card .th{position:relative;aspect-ratio:16/9;border-radius:12px;overflow:hidden;background:var(--bg2);display:block}
+.card .th img{width:100%;height:100%;object-fit:cover}
+.card:hover .th{border-radius:0;transition:.2s}
+.dur{position:absolute;right:6px;bottom:6px;background:#000c;color:#fff;font-size:12px;font-weight:500;padding:1px 4px;border-radius:4px}
+.meta{display:flex;gap:12px;margin-top:12px}
+.meta h3{margin:0 0 4px;font-size:16px;font-weight:600;line-height:22px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.sub{color:var(--tx2);font-size:14px}.sub a:hover{color:var(--tx)}
+.ava{width:36px;height:36px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:600;color:#fff;object-fit:cover}
+.watch{display:grid;grid-template-columns:minmax(0,1fr) 402px;gap:24px;max-width:1700px;margin:0 auto;padding-top:24px}
+.player{position:relative;aspect-ratio:16/9;background:#000;border-radius:12px;overflow:hidden}
+.player iframe{width:100%;height:100%;border:0}
+.watch h1{font-size:20px;margin:12px 0 8px;line-height:28px}
+.row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between}
+.row>div{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--chip);height:36px;padding:0 16px;border-radius:18px;font-weight:500;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--hover)}.btn.on{background:var(--chipa);color:var(--chipat)}
+.btn.red{background:var(--red);color:#fff}
+.desc{background:var(--chip);border-radius:12px;padding:12px;margin-top:12px;white-space:pre-wrap;word-break:break-word}
+.desc.c{max-height:90px;overflow:hidden;cursor:pointer}
+.desc a{color:#3ea6ff}
+.cm{display:flex;gap:16px;margin:20px 0}.cm b{font-size:13px}.cm p{margin:4px 0;white-space:pre-wrap;word-break:break-word}
+.rel{display:flex;gap:8px;margin-bottom:8px}
+.rel .th{position:relative;width:168px;flex:none;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:var(--bg2)}
+.rel .th img{width:100%;height:100%;object-fit:cover}
+.rel h3{margin:0 0 4px;font-size:14px;line-height:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.chh{display:flex;gap:24px;align-items:center;padding:24px 0;flex-wrap:wrap}
+.chh .ava{width:128px;height:128px;font-size:48px}.chh h1{margin:0 0 6px;font-size:36px}
+.msg{padding:48px 16px;text-align:center;color:var(--tx2)}.msg.err{color:#ff6b6b}
+.modal{position:fixed;inset:0;background:#0009;display:none;place-items:center;z-index:100}
+.modal.open{display:grid}
+.box{background:var(--bg2);border-radius:16px;padding:24px;width:min(520px,92vw);max-height:90vh;overflow:auto}
+.box h2{margin:0 0 8px}.box ol{padding-left:20px;color:var(--tx2)}.box a{color:#3ea6ff}
+.box input,.box select{width:100%;height:40px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:8px;padding:0 12px;margin:6px 0 14px;font-size:15px}
+.sk{height:200px;border-radius:12px;background:var(--bg2);animation:p 1.2s infinite alternate}
+@keyframes p{to{opacity:.5}}
+@media (prefers-reduced-motion:reduce){.sk{animation:none}.card:hover .th{transition:none}}
+@media(max-width:1000px){.watch{grid-template-columns:1fr}}
+@media(max-width:900px){nav{display:none}body.mini nav{display:block;box-shadow:0 0 0 100vw #0007}main,body.mini main{margin-left:0;padding:56px 12px 40px}.logo span{display:none}}
+.banner{display:block;width:100%;height:min(22vw,200px);object-fit:cover;border-radius:12px;margin-top:16px}
+.tabs{display:flex;gap:8px;border-bottom:1px solid var(--chip);position:sticky;top:56px;background:var(--bg);z-index:31}
+.tab{padding:12px 16px;font-weight:600;color:var(--tx2);border-bottom:2px solid transparent}.tab.on{color:var(--tx);border-color:var(--tx)}
+.chcard{display:flex;gap:24px;align-items:center;padding:12px 0 20px;max-width:1100px;margin:auto}.chcard .ava{width:120px;height:120px;font-size:44px;margin-left:8%}
+.chcard b{font-size:18px}.about{max-width:760px;padding:20px 0;line-height:1.6}.about .sub{margin-top:8px}
+@media(max-width:700px){.chcard .ava{width:72px;height:72px;font-size:28px;margin:0}.chcard{gap:14px}}
+</style>
+</head>
+<body class="mini">
+<header>
+  <div class="hl"><button class="ib" id="menu" aria-label="Menu">&#9776;</button><a class="logo" href="#/"><i>&#9654;</i><span>MicroTube</span></a></div>
+  <div class="sw"><form class="sb" id="sf" autocomplete="off"><input id="q" placeholder="Search" aria-label="Search"><button aria-label="Search">&#128269;</button></form><div id="sugg"></div></div>
+  <div class="hr"><button class="ib" id="theme" aria-label="Toggle theme">&#9788;</button><button class="ib" id="gear" aria-label="Settings">&#9881;</button></div>
+</header>
+<nav id="nav"></nav>
+<main id="app"></main>
+
+<div class="modal" id="set"><div class="box">
+  <h2>Connect to YouTube</h2>
+  <p class="sub">This page needs a free YouTube Data API key.</p>
+  <ol>
+    <li>Open <a href="https://console.cloud.google.com/" target="_blank" rel="noopener">Google Cloud Console</a> and create a project.</li>
+    <li>Go to APIs &amp; Services, then Library, and enable <b>YouTube Data API v3</b>.</li>
+    <li>Go to Credentials, choose Create credentials, then API key.</li>
+    <li>Paste the key below.</li>
+  </ol>
+  <label>API key<input id="key" placeholder="AIza..."></label>
+  <label>Region for trending<select id="reg"></select></label>
+  <div style="display:flex;gap:8px;justify-content:flex-end"><button class="btn" id="cls">Cancel</button><button class="btn red" id="sv">Save</button></div>
+</div></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const S={get(k,d){try{const v=JSON.parse(localStorage.getItem('yt_'+k));return v??d}catch{return d}},set(k,v){try{localStorage.setItem('yt_'+k,JSON.stringify(v))}catch{}}};
+const DEFAULT_KEY='AIzaSyDz7MlVhQvh0PTKS0TKAAiKhsuuEv2rt3w';
+let KEY=S.get('key','')||DEFAULT_KEY,REG=S.get('reg','US'),obs=null,cat='';
+const REGS={US:'United States',GB:'United Kingdom',CA:'Canada',AU:'Australia',IN:'India',DE:'Germany',FR:'France',JP:'Japan',BR:'Brazil',MX:'Mexico'};
+const CATS=[['All',''],['Music','10'],['Gaming','20'],['Sports','17'],['Comedy','23'],['Entertainment','24'],['News','25'],['Film','1'],['Science','28'],['Pets','15'],['Travel','19']];
+const compact=n=>n==null?'':new Intl.NumberFormat('en',{notation:'compact',maximumFractionDigits:1}).format(+n);
+const ago=d=>{const s=(Date.now()-new Date(d))/1000,u=[['year',31536000],['month',2592000],['week',604800],['day',86400],['hour',3600],['minute',60]];for(const[n,v]of u)if(s>=v){const k=Math.floor(s/v);return k+' '+n+(k>1?'s':'')+' ago'}return 'just now'};
+const dur=i=>{if(!i)return'';const m=i.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);if(!m)return'';const h=+m[1]||0,mi=+m[2]||0,s=+m[3]||0,p=x=>String(x).padStart(2,'0');if(!h&&!mi&&!s)return'LIVE';return h?h+':'+p(mi)+':'+p(s):mi+':'+p(s)};
+const hue=s=>{let h=0;for(const c of String(s))h=(h*31+c.charCodeAt(0))%360;return`hsl(${h} 55% 42%)`};
+const ava=(t,img,cls='')=>img?`<img class="ava ${cls}" src="${esc(img)}" alt="">`:`<div class="ava ${cls}" style="background:${hue(t)}">${esc((t||'?')[0].toUpperCase())}</div>`;
+
+async function api(ep,p){
+  if(!KEY){openSet();throw new Error('Add your API key in settings to get started.')}
+  const u=new URL('https://www.googleapis.com/youtube/v3/'+ep);
+  Object.entries({...p,key:KEY}).forEach(([k,v])=>v!=null&&v!==''&&u.searchParams.set(k,v));
+  const r=await fetch(u),j=await r.json();
+  if(!r.ok)throw new Error(j.error?.message?.replace(/<[^>]+>/g,'')||'The YouTube API returned an error.');
+  return j;
+}
+const norm=v=>({id:v.id,title:v.snippet.title,ch:v.snippet.channelTitle,chId:v.snippet.channelId,thumb:(v.snippet.thumbnails.medium||v.snippet.thumbnails.default||{}).url,views:v.statistics?.viewCount,dur:v.contentDetails?.duration,date:v.snippet.publishedAt,desc:v.snippet.description,likes:v.statistics?.likeCount,cc:v.statistics?.commentCount});
+async function details(ids){if(!ids.length)return[];const j=await api('videos',{part:'snippet,statistics,contentDetails',id:ids.join(',')});return j.items.map(norm)}
+async function searchVids(p){const j=await api('search',{part:'snippet',type:'video',maxResults:20,videoEmbeddable:'true',...p});return{items:await details(j.items.map(i=>i.id.videoId).filter(Boolean)),next:j.nextPageToken}}
+
+const card=v=>`<div class="card"><a class="th" href="#/watch/${v.id}"><img loading="lazy" src="${esc(v.thumb)}" alt=""><span class="dur">${dur(v.dur)}</span></a>
+<div class="meta"><a href="#/channel/${v.chId}">${ava(v.ch)}</a><div><a href="#/watch/${v.id}"><h3>${esc(v.title)}</h3></a>
+<div class="sub"><a href="#/channel/${v.chId}">${esc(v.ch)}</a><br>${v.views!=null?compact(v.views)+' views &middot; ':''}${ago(v.date)}</div></div></div></div>`;
+const relCard=v=>`<div class="rel"><a class="th" href="#/watch/${v.id}"><img loading="lazy" src="${esc(v.thumb)}" alt=""><span class="dur">${dur(v.dur)}</span></a>
+<div><a href="#/watch/${v.id}"><h3>${esc(v.title)}</h3></a><div class="sub">${esc(v.ch)}<br>${v.views!=null?compact(v.views)+' views &middot; ':''}${ago(v.date)}</div></div></div>`;
+
+function feed(el,fn,render=card){
+  if(obs)obs.disconnect();
+  let tok=null,busy=false,done=false,n=0;
+  el.innerHTML='<div class="sk"></div>'.repeat(0);
+  const end=document.createElement('div');end.style.height='1px';el.after(end);
+  async function more(){
+    if(busy||done)return;busy=true;
+    try{const r=await fn(tok);tok=r.next;if(!tok)done=true;n+=r.items.length;el.insertAdjacentHTML('beforeend',r.items.map(render).join(''));
+      if(!n)el.innerHTML='<div class="msg">Nothing to show here yet.</div>'}
+    catch(e){done=true;el.insertAdjacentHTML('beforeend',`<div class="msg err">${esc(e.message)}</div>`)}
+    busy=false;
+  }
+  obs=new IntersectionObserver(e=>{if(e[0].isIntersecting)more()},{rootMargin:'600px'});
+  obs.observe(end);more();
+}
+
+/* ---------- pages ---------- */
+function chipsHtml(){return`<div class="chips">${CATS.map(c=>`<button class="chip ${c[1]===cat?'on':''}" data-cat="${c[1]}">${c[0]}</button>`).join('')}</div>`}
+function home(){
+  $('#app').innerHTML=chipsHtml()+'<div class="grid" id="g"></div>';
+  feed($('#g'),async t=>{
+    const p={part:'snippet,statistics,contentDetails',chart:'mostPopular',regionCode:REG,maxResults:24,pageToken:t};
+    if(cat)p.videoCategoryId=cat;
+    const j=await api('videos',p);return{items:j.items.map(norm),next:j.nextPageToken};
+  });
+}
+function search(q){
+  $('#app').innerHTML=`<div id="chres"></div><div class="chips"><button class="chip on" data-ord="relevance">Relevance</button><button class="chip" data-ord="date">Upload date</button><button class="chip" data-ord="viewCount">View count</button><button class="chip" data-ord="rating">Rating</button></div><div class="grid" id="g" style="grid-template-columns:1fr;max-width:1100px;margin:auto"></div>`;
+  const run=ord=>feed($('#g'),t=>searchVids({q,order:ord,pageToken:t}),v=>`<div class="rel" style="gap:16px"><a class="th" style="width:min(360px,40vw)" href="#/watch/${v.id}"><img src="${esc(v.thumb)}" alt=""><span class="dur">${dur(v.dur)}</span></a><div><a href="#/watch/${v.id}"><h3 style="font-size:18px;font-weight:400">${esc(v.title)}</h3></a><div class="sub">${v.views!=null?compact(v.views)+' views &middot; ':''}${ago(v.date)}</div><div class="sub" style="margin:8px 0"><a href="#/channel/${v.chId}">${esc(v.ch)}</a></div><div class="sub">${esc((v.desc||'').slice(0,140))}</div></div></div>`);
+  $('#app').onclick=e=>{const b=e.target.closest('[data-ord]');if(!b)return;document.querySelectorAll('[data-ord]').forEach(x=>x.classList.toggle('on',x===b));document.querySelector('#g+div')?.remove();run(b.dataset.ord)};
+  run('relevance');
+  api('search',{part:'snippet',type:'channel',q,maxResults:3}).then(async j=>{
+    const ids=j.items.map(i=>i.snippet.channelId||i.id.channelId).filter(Boolean);if(!ids.length)return;
+    const d=await api('channels',{part:'snippet,statistics',id:ids.join(',')});const box=$('#chres');if(!box)return;
+    box.innerHTML=d.items.map(c=>`<a class="chcard" href="#/channel/${c.id}">${ava(c.snippet.title,c.snippet.thumbnails?.medium?.url)}<div><b>${esc(c.snippet.title)}</b><div class="sub">${esc(c.snippet.customUrl||'')}${c.statistics.hiddenSubscriberCount?'':' &middot; '+compact(c.statistics.subscriberCount)+' subscribers'} &middot; ${compact(c.statistics.videoCount)} videos</div><div class="sub">${esc((c.snippet.description||'').slice(0,120))}</div></div></a>`).join('');
+  }).catch(()=>{});
+}
+async function channel(raw){
+  const app=$('#app');app.innerHTML='<div class="sk"></div>';
+  try{
+    raw=decodeURIComponent(raw);
+    const j=await api('channels',{part:'snippet,statistics,brandingSettings',...(raw.startsWith('@')?{forHandle:raw}:{id:raw})});const c=j.items?.[0];
+    if(!c){app.innerHTML='<div class="msg">Channel not found.</div>';return}
+    const id=c.id,sn=c.snippet,subd=!!S.get('subs',[]).find(s=>s.id===id),banner=c.brandingSettings?.image?.bannerExternalUrl;
+    document.title=sn.title+' - MicroTube';
+    app.innerHTML=`${banner?`<img class="banner" src="${esc(banner)}=w1707" alt="">`:''}<div class="chh">${ava(sn.title,sn.thumbnails?.medium?.url)}<div><h1>${esc(sn.title)}</h1><div class="sub">${esc(sn.customUrl||'')}${c.statistics.hiddenSubscriberCount?'':' &middot; '+compact(c.statistics.subscriberCount)+' subscribers'} &middot; ${compact(c.statistics.videoCount)} videos</div><div class="sub" style="margin:8px 0;max-width:600px">${esc((sn.description||'').slice(0,160))}</div><button class="btn ${subd?'':'red'}" data-act="sub" data-id="${id}" data-t="${esc(sn.title)}" data-img="${esc(sn.thumbnails?.default?.url||'')}">${subd?'Subscribed':'Subscribe'}</button></div></div><div class="tabs"><button class="tab on" data-tab="videos">Videos</button><button class="tab" data-tab="playlists">Playlists</button><button class="tab" data-tab="about">About</button></div><div id="tc"></div>`;
+    const vids=ord=>feed($('#g'),t=>searchVids({channelId:id,order:ord,pageToken:t}));
+    const tab=name=>{
+      if(obs)obs.disconnect();document.querySelectorAll('#tc+div').forEach(x=>x.remove());
+      const tc=$('#tc');
+      if(name==='videos'){tc.innerHTML='<div class="chips" style="top:104px"><button class="chip on" data-ord="date">Latest</button><button class="chip" data-ord="viewCount">Popular</button></div><div class="grid" id="g"></div>';vids('date')}
+      else if(name==='playlists'){tc.innerHTML='<div class="grid" id="g" style="padding-top:16px"></div>';
+        feed($('#g'),async t=>{const r=await api('playlists',{part:'snippet,contentDetails',channelId:id,maxResults:24,pageToken:t});return{items:r.items,next:r.nextPageToken}},
+        p=>`<div class="card"><a class="th" href="#/playlist/${p.id}"><img loading="lazy" src="${esc((p.snippet.thumbnails.medium||p.snippet.thumbnails.default||{}).url)}" alt=""><span class="dur">${p.contentDetails.itemCount} videos</span></a><div class="meta"><div><a href="#/playlist/${p.id}"><h3>${esc(p.snippet.title)}</h3></a><div class="sub">View full playlist</div></div></div></div>`)}
+      else{tc.innerHTML=`<div class="about"><div style="white-space:pre-wrap">${link(sn.description||'No description.')}</div><div class="sub"><b>Joined</b> ${new Date(sn.publishedAt).toLocaleDateString()}</div><div class="sub"><b>Total views</b> ${(+c.statistics.viewCount).toLocaleString()}</div><div class="sub"><b>Videos</b> ${(+c.statistics.videoCount).toLocaleString()}</div>${sn.country?`<div class="sub"><b>Country</b> ${esc(sn.country)}</div>`:''}<div class="sub"><a href="https://www.youtube.com/channel/${id}" target="_blank" rel="noopener">View channel on YouTube</a></div></div>`}
+    };
+    app.onclick=e=>{
+      const t=e.target.closest('[data-tab]');
+      if(t){document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('on',x===t));tab(t.dataset.tab);return}
+      const b=e.target.closest('[data-ord]');if(!b)return;
+      document.querySelectorAll('[data-ord]').forEach(x=>x.classList.toggle('on',x===b));document.querySelector('#g+div')?.remove();vids(b.dataset.ord)};
+    tab('videos');
+  }catch(e){app.innerHTML=`<div class="msg err">${esc(e.message)}</div>`}
+}
+async function playlist(id){
+  const app=$('#app');app.innerHTML='<div class="sk"></div>';
+  try{
+    const j=await api('playlists',{part:'snippet',id});const p=j.items?.[0];
+    if(!p){app.innerHTML='<div class="msg">Playlist not found.</div>';return}
+    document.title=p.snippet.title+' - MicroTube';
+    app.innerHTML=`<h1 style="padding-top:24px;margin:0">${esc(p.snippet.title)}</h1><div class="sub" style="margin:4px 0 12px">by <a href="#/channel/${p.snippet.channelId}">${esc(p.snippet.channelTitle)}</a></div><div class="grid" id="g"></div>`;
+    feed($('#g'),async t=>{const r=await api('playlistItems',{part:'contentDetails',playlistId:id,maxResults:24,pageToken:t});return{items:await details(r.items.map(i=>i.contentDetails.videoId)),next:r.nextPageToken}});
+  }catch(e){app.innerHTML=`<div class="msg err">${esc(e.message)}</div>`}
+}
+const link=t=>esc(t).replace(/(https?:\/\/[^\s<]+)/g,'<a href="$1" target="_blank" rel="noopener">$1</a>');
+
+/* YouTube error 153 fix: YouTube's embed needs a real http(s) origin/referrer.
+   Opened as a local file (file://) no referrer is sent, so the player refuses to load. */
+const IS_FILE=location.protocol==='file:'||location.origin==='null';
+function playerHTML(id){
+  const eid=encodeURIComponent(id);
+  if(IS_FILE){
+    return `<div class="fileplay" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:20px;background:#000 url(https://i.ytimg.com/vi/${eid}/hqdefault.jpg) center/cover no-repeat"><div style="position:absolute;inset:0;background:rgba(0,0,0,.72)"></div><div style="position:relative;max-width:520px"><div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:6px">Embedded player can't run from a local file</div><div style="font-size:13px;color:#ccc;margin-bottom:14px;line-height:1.5">YouTube blocks embeds (Error 153) when a page is opened as a file. Run this page from a web address (e.g. http://localhost or GitHub Pages / Netlify) and the player will work here.</div><a class="btn red" href="https://www.youtube.com/watch?v=${eid}" target="_blank" rel="noopener" style="display:inline-block;padding:10px 18px;text-decoration:none">&#9654; Watch on YouTube</a></div></div>`;
+  }
+  const origin=encodeURIComponent(location.origin);
+  return `<iframe src="https://www.youtube.com/embed/${eid}?autoplay=1&rel=0&playsinline=1&enablejsapi=1&origin=${origin}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture;web-share" allowfullscreen referrerpolicy="strict-origin-when-cross-origin" title="Video player"></iframe>`;
+}
+async function watch(id){
+  const app=$('#app');app.onclick=null;
+  app.innerHTML=`<div class="watch"><div><div class="player">${playerHTML(id)}</div><div id="info"><div class="sk" style="height:80px;margin-top:16px"></div></div><div id="cms"></div></div><div id="rel"></div></div>`;
+  let v;
+  try{v=(await details([id]))[0];if(!v)throw new Error('Video not found.')}catch(e){$('#info').innerHTML=`<div class="msg err">${esc(e.message)}</div>`;return}
+  document.title=v.title+' - MicroTube';
+  const h=S.get('history',[]).filter(x=>x.id!==id);h.unshift({id,title:v.title,ch:v.ch,chId:v.chId,thumb:v.thumb,views:v.views,dur:v.dur,date:v.date});S.set('history',h.slice(0,100));
+  const render=()=>{
+    const liked=S.get('liked',[]).some(x=>x.id===id),later=S.get('later',[]).some(x=>x.id===id),subd=S.get('subs',[]).some(s=>s.id===v.chId);
+    $('#info').innerHTML=`<h1>${esc(v.title)}</h1><div class="row"><div><a href="#/channel/${v.chId}" id="cav">${ava(v.ch,chImg)}</a><div><a href="#/channel/${v.chId}"><b>${esc(v.ch)}</b></a><div class="sub">${chSubs}</div></div><button class="btn ${subd?'':'red'}" data-act="sub" data-id="${v.chId}" data-t="${esc(v.ch)}" data-img="${esc(chImg||'')}">${subd?'Subscribed':'Subscribe'}</button></div>
+<div><button class="btn ${liked?'on':''}" data-act="like">&#128077; ${compact(+v.likes+(liked?1:0))||'Like'}</button><button class="btn ${later?'on':''}" data-act="later">&#9201; ${later?'Saved':'Save'}</button><button class="btn" data-act="share">Share</button><a class="btn" href="https://www.youtube.com/watch?v=${id}" target="_blank" rel="noopener">Watch on YouTube</a></div></div>
+<div class="desc c" id="ds"><b>${compact(v.views)} views &nbsp; ${ago(v.date)}</b>\n${link(v.desc)}</div>`;
+    $('#ds').onclick=e=>{if(e.target.tagName!=='A')e.currentTarget.classList.remove('c')};
+  };
+  let chImg='',chSubs='';
+  window._v=v;window._render=render;render();
+  api('channels',{part:'snippet,statistics',id:v.chId}).then(j=>{const c=j.items[0];chImg=c.snippet.thumbnails?.default?.url;chSubs=c.statistics.hiddenSubscriberCount?'':compact(c.statistics.subscriberCount)+' subscribers';render()}).catch(()=>{});
+  searchVids({q:v.title,maxResults:15}).then(r=>{$('#rel').innerHTML=r.items.filter(x=>x.id!==id).map(relCard).join('')}).catch(()=>{});
+  api('commentThreads',{part:'snippet',videoId:id,order:'relevance',maxResults:25,textFormat:'plainText'}).then(j=>{
+    $('#cms').innerHTML=`<h2 style="font-size:20px;margin:24px 0">${compact(v.cc)} Comments</h2>`+j.items.map(i=>{const c=i.snippet.topLevelComment.snippet;return`<div class="cm">${ava(c.authorDisplayName,c.authorProfileImageUrl)}<div><b>${esc(c.authorDisplayName)}</b> <span class="sub">${ago(c.publishedAt)}</span><p>${esc(c.textDisplay)}</p><span class="sub">&#128077; ${compact(c.likeCount)} &middot; ${i.snippet.totalReplyCount} replies</span></div></div>`}).join('');
+  }).catch(()=>{$('#cms').innerHTML='<div class="msg">Comments are turned off for this video.</div>'});
+}
+function library(kind){
+  const names={history:'Watch history',liked:'Liked videos',later:'Watch later'};
+  const list=S.get(kind,[]);
+  $('#app').innerHTML=`<div class="row" style="padding:24px 0 0"><h1 style="margin:0">${names[kind]}</h1>${list.length?`<button class="btn" data-act="clear" data-k="${kind}">Clear all</button>`:''}</div>`+(list.length?`<div class="grid">${list.map(card).join('')}</div>`:'<div class="msg">Nothing here yet. Videos you watch or save will show up here.</div>');
+}
+function subs(){
+  const l=S.get('subs',[]);
+  $('#app').innerHTML=`<h1 style="padding-top:24px;margin:0">Subscriptions</h1>`+(l.length?`<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(180px,1fr))">${l.map(s=>`<a href="#/channel/${s.id}" style="text-align:center">${ava(s.title,s.img,'')}<div style="margin-top:8px"><b>${esc(s.title)}</b></div></a>`).join('')}</div>`:'<div class="msg">Subscribe to channels and they will appear here.</div>');
+}
+
+/* ---------- router, nav, events ---------- */
+function navHtml(r){
+  const it=(h,i,t)=>`<a href="${h}" class="${r===h?'on':''}"><span>${i}</span>${t}</a>`;
+  const sl=S.get('subs',[]);
+  return it('#/','&#8962;','Home')+it('#/subs','&#9733;','Subscriptions')+'<hr><h4>You</h4>'+it('#/lib/history','&#8635;','History')+it('#/lib/later','&#9201;','Watch later')+it('#/lib/liked','&#128077;','Liked videos')+
+  (sl.length?'<hr><h4>Subscriptions</h4>'+sl.slice(0,12).map(s=>`<a href="#/channel/${s.id}">${ava(s.title,s.img)}<span>${esc(s.title)}</span></a>`).join(''):'');
+}
+function route(){
+  if(obs)obs.disconnect();document.querySelectorAll('#app+div').forEach(x=>x.remove());
+  const h=location.hash||'#/',[,p,a]=h.match(/^#\/([^/]*)\/?(.*)$/)||[];
+  $('#app').onclick=null;document.title='MicroTube';scrollTo(0,0);
+  $('#nav').innerHTML=navHtml(h);
+  if(window.innerWidth<=900)document.body.classList.remove('mini');document.body.classList.add(window.innerWidth<=900?'mini':'x');document.body.classList.remove('x');
+  if(window.innerWidth>900)document.body.classList.remove('mini');
+  if(window.innerWidth<=900)document.body.classList.add('mini');
+  if(p==='watch')return watch(decodeURIComponent(a));
+  if(p==='search')return search(decodeURIComponent(a));
+  if(p==='channel')return channel(a);
+  if(p==='playlist')return playlist(a);
+  if(p==='lib')return library(a);
+  if(p==='subs')return subs();
+  home();
+}
+addEventListener('hashchange',route);
+$('#menu').onclick=()=>{document.body.classList.toggle('mini')};
+$('#theme').onclick=()=>{const l=document.documentElement.classList.toggle('light');S.set('light',l)};
+if(S.get('light',false))document.documentElement.classList.add('light');
+$('#sf').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(!q)return;const h=S.get('sh',[]).filter(x=>x!==q);h.unshift(q);S.set('sh',h.slice(0,8));$('#sugg').style.display='none';location.hash=(q[0]==='@'&&!/\s/.test(q)?'#/channel/':'#/search/')+encodeURIComponent(q)};
+$('#q').onfocus=$('#q').oninput=()=>{const v=$('#q').value.toLowerCase(),l=S.get('sh',[]).filter(x=>x.toLowerCase().includes(v));$('#sugg').innerHTML=l.map(x=>`<div>&#8635; ${esc(x)}</div>`).join('');$('#sugg').style.display=l.length?'block':'none'};
+$('#sugg').onmousedown=e=>{const d=e.target.closest('div');if(d&&d.parentNode.id==='sugg'){$('#q').value=d.textContent.replace(/^\S+\s/,'');$('#sf').requestSubmit()}};
+$('#q').onblur=()=>{$('#sugg').style.display='none'};
+document.addEventListener('click',e=>{
+  const c=e.target.closest('[data-cat]');if(c){cat=c.dataset.cat;home();return}
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const act=b.dataset.act,v=window._v;
+  const toggle=k=>{const l=S.get(k,[]),i=l.findIndex(x=>x.id===v.id);i>=0?l.splice(i,1):l.unshift({id:v.id,title:v.title,ch:v.ch,chId:v.chId,thumb:v.thumb,views:v.views,dur:v.dur,date:v.date});S.set(k,l)};
+  if(act==='like'){toggle('liked');window._render()}
+  if(act==='later'){toggle('later');window._render()}
+  if(act==='share'){const u='https://www.youtube.com/watch?v='+v.id;(navigator.clipboard?.writeText(u)||Promise.reject()).then(()=>{b.textContent='Link copied'}).catch(()=>prompt('Copy this link',u))}
+  if(act==='sub'){const l=S.get('subs',[]),i=l.findIndex(s=>s.id===b.dataset.id);i>=0?l.splice(i,1):l.unshift({id:b.dataset.id,title:b.dataset.t,img:b.dataset.img});S.set('subs',l);$('#nav').innerHTML=navHtml(location.hash||'#/');if(window._render&&location.hash.startsWith('#/watch'))window._render();else{b.textContent=i>=0?'Subscribe':'Subscribed';b.classList.toggle('red',i>=0)}}
+  if(act==='clear'){S.set(b.dataset.k,[]);library(b.dataset.k)}
+});
+/* settings */
+$('#reg').innerHTML=Object.entries(REGS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+function openSet(){$('#key').value=KEY;$('#reg').value=REG;$('#set').classList.add('open')}
+$('#gear').onclick=openSet;$('#cls').onclick=()=>$('#set').classList.remove('open');
+$('#sv').onclick=()=>{KEY=$('#key').value.trim();REG=$('#reg').value;S.set('key',KEY);S.set('reg',REG);$('#set').classList.remove('open');route()};
+$('#set').onclick=e=>{if(e.target.id==='set')$('#set').classList.remove('open')};
+document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement.tagName!=='INPUT'){e.preventDefault();$('#q').focus()}if(e.key==='Escape')$('#set').classList.remove('open')});
+route();
+if(!KEY)openSet();
+</script>
+</body>
+</html>
